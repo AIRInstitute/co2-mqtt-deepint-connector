@@ -1,6 +1,6 @@
-# MQTT to Deep Intelligence connector
+# MQTT to Deep Intelligence connector for the proyect CO2
 
-Connector to read data from MQTT and dump it into [Deep Intelligence](https://deepint.net/)
+Connector to read data from MQTT and dump it into [Deep Intelligence](https://deepint.net/). Also retrieves the MQTT's topic relation with Deep Intelligence Source information from the project's API.
 
 ## How to install tool
 
