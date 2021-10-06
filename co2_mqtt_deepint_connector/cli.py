@@ -35,7 +35,7 @@ def run(
         or config_url is None \
         or deepint_auth_token is None:
         
-        logger.info(f'ERROR: Any of mqtt_broker({mqtt_broker}), mqtt_user({mqtt_user}), mqtt_password({mqtt_password}), config_url({config_url}) or deepint_auth_token({deepint_auth_token}) not provided.')
+        logger.warning(f'ERROR: Any of mqtt_broker({mqtt_broker}), mqtt_user({mqtt_user}), mqtt_password({mqtt_password}), config_url({config_url}) or deepint_auth_token({deepint_auth_token}) not provided.')
         return
 
     # disable logging if necceary

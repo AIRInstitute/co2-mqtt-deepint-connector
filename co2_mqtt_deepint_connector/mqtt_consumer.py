@@ -77,19 +77,21 @@ class MQTTConsumer:
         content = json.loads(message.payload.decode("utf-8"))
 
         # add message to queue
-        logger.info('new message')
         if topic not in message_queue:
             message_queue[topic] = []
+            logger.info(f'added new topic {topic}')
+
         message_queue[topic].append(content)
 
         # dump into deepint if neccesary
         if len(message_queue[topic]) >= message_limit:
-            producer = message_router_.map(topic)
+            producer = message_router_.resolve(topic)
             if producer is None:
-                logger.info(f'Dumping messages from topic {topic} due to lack of configuration from server.')
+                logger.warning(f'deleting messages from topic {topic} due to lack of configuration from server')
             else:
+                logger.info(f'sending messages from topic {topic} to deepint.net')
                 producer.produce(data=message_queue)
-                message_queue[topic].clear()
+            message_queue[topic].clear()
 
     def loop(self) -> None:
         """ Starts the MQTT consumer and produces messages to deepint for undefined time.
