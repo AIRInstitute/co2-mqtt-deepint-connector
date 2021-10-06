@@ -1,6 +1,6 @@
 #!usr/bin/python
 
-# Copyright 2021 Deep Intelligence
+# Copyright 2021 AIR Institute
 # See LICENSE for details.
 
 
@@ -9,7 +9,7 @@ import logging.config
 from os import path
 
 
-LOGGER_NAME = 'mqtt-deepint-connector'
+LOGGER_NAME = 'co2-mqtt-deepint-connector'
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -26,7 +26,7 @@ LOGGING_CONFIG = {
     },
     'handlers': {
         'consoleHandler': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'formatter': 'consoleFormatter',
             'class': 'logging.StreamHandler'
         }

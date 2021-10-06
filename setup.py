@@ -1,6 +1,6 @@
 #!usr/bin/python
 
-# Copyright 2021 Deep Intelligence
+# Copyright 2021 AIR Institute
 # See LICENSE for details.
 
 
@@ -20,21 +20,21 @@ def read_requeriments_file(filename):
 
 
 setup(
-    name='mqtt-deepint-connector',
+    name='co2-mqtt-deepint-connector',
     version='1.0',
     packages=find_packages(),
-    url='https://github.com/air-institute/mqtt-deepint-connector',
-    download_url='https://github.com/air-institute/mqtt-deepint-connector/archive/master.zip',
+    url='https://github.com/air-institute/co2-mqtt-deepint-connector',
+    download_url='https://github.com/air-institute/co2-mqtt-deepint-connector/archive/master.zip',
     license='GNU Affero General Public License v3',
     author='AIR Institute',
-    author_email='franpintosantos@usal.es',
+    author_email='franpintosantos@air-institute.com',
     description=' ',
     long_description=readme(),
     long_description_content_type='text/markdown',
     install_requires=list(read_requeriments_file('requirements.txt')),
     entry_points={
         'console_scripts': [
-            'mqtt-deepint-connector=mqtt_deepint_connector.cli:run'
+            'co2-mqtt-deepint-connector=co2_mqtt_deepint_connector.cli:run'
         ],
     },
     include_package_data=True,
@@ -51,8 +51,8 @@ setup(
     keywords='MQTT, Deep Intelligence, connector',
     python_requires='>=3',
     project_urls={
-        'Bug Reports': 'https://github.com/air-institute/mqtt-deepint-connector/issues',
-        'Source': 'https://github.com/air-institute/mqtt-deepint-connector',
-        'Documentation': 'https://github.com/air-institute/mqtt-deepint-connector'
+        'Bug Reports': 'https://github.com/air-institute/co2-mqtt-deepint-connector/issues',
+        'Source': 'https://github.com/air-institute/co2-mqtt-deepint-connector',
+        'Documentation': 'https://github.com/air-institute/co2-mqtt-deepint-connector'
     },
 )

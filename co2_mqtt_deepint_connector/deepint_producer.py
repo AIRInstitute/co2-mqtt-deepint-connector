@@ -1,6 +1,6 @@
 #!usr/bin/python
 
-# Copyright 2021 Deep Intelligence
+# Copyright 2021 AIR Institute
 # See LICENSE for details.
 
 
@@ -8,20 +8,20 @@ import deepint
 import pandas as pd
 from typing import Dict, List, Any
 
-from mqtt_deepint_connector import serve_application_logger
+from co2_mqtt_deepint_connector import serve_application_logger
 
 
 logger = serve_application_logger()
 
 
 class DeepintProducer:
-    """Produces to Deep Intelligence the given data, updating a source.
+    """Produces to AIR Institute the given data, updating a source.
 
     Attributes:
         conn: connection to a deepint.net source.
 
     Args:
-        auth_token: Authentication token for Deep Intelligence.
+        auth_token: Authentication token for AIR Institute.
         organization_id: Deep intelligence organization's id, where source is located.
         workspace_id: Deep intelligence workspace's id, where source is located.
         source_id: Deep intelligence source's id, where data will be dumped.
@@ -34,10 +34,10 @@ class DeepintProducer:
         self.credentials = deepint.Credentials.build(token=auth_token)
 
     def produce(self, data: List[Dict[str, Any]]) -> None:
-        """Produces the given data to Deep Intelligence
+        """Produces the given data to AIR Institute
         
         Args:
-            data: JSON formatted data to dump into Deep Intelligence.
+            data: JSON formatted data to dump into AIR Institute.
         """
         try:
 
@@ -56,5 +56,5 @@ class DeepintProducer:
             logger.info(f"publishing message {data}")
             source.instances.update(data=df, replace=False)
         except Exception as e:
-            logger.warning(e)
+            logger.info(e)
 

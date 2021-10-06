@@ -1,7 +1,8 @@
 #!usr/bin/python
 
-# Copyright 2021 Deep Intelligence
+# Copyright 2021 AIR Institute
 # See LICENSE for details.
+
 
 import json
 import time
@@ -9,12 +10,12 @@ import uuid
 import paho.mqtt.client as mqtt
 from typing import Dict, List, Any
 
-from mqtt_deepint_connector import DeepintProducer, serve_application_logger
+from co2_mqtt_deepint_connector import DeepintProducer, MessageRouter, serve_application_logger
 
 
-producer = None
 message_limit = 10
-message_queue = []
+message_queue = {}
+message_router_ = None
 
 logger = serve_application_logger()
 
@@ -22,37 +23,35 @@ logger = serve_application_logger()
 class MQTTConsumer:
     """Consumes from a MQTT list of topics.
 
-    Note: uses the global variables producer, message_limit and message_queue to run.
+    Note: uses the global variables message_limit and message_queue to run.
 
     Attributes:
         client: connection to MQTT broker.
 
     Args:
-        deepint_producer: producer to send data to deepint on message received.
+        message_router: performs the mapping between MQTT's topic and Deep Intelligence's source 
         mqtt_broker: MQTT's broker IP.
         mqtt_port: MQTT's broker port.
         mqtt_user: MQTT's broker user.
         mqtt_password: MQTT's broker password.
-        mqtt_topics: topics from data comes from.
         mqtt_client_id: MQTT's client id. If not provided, an UUIDv4 will be generated.
-        num_message_limit: number of messages to store before dumpt to Deep Intelligence. If set to 0 each message is send.
+        num_message_limit: number of messages to store before dumpt to AIR Institute. If set to 0 each message is send.
     """
 
     def __init__(self
-            , deepint_producer: DeepintProducer
+            , message_router: MessageRouter
             , mqtt_broker: str
             , mqtt_port: int
             , mqtt_user: str
             , mqtt_password: str
-            , mqtt_topics: List[str]
             , mqtt_client_id: str = None
             , num_message_limit: int = 10
         ):
 
-        global producer, message_limit
+        global message_router_, message_limit
 
         # save producer
-        producer = deepint_producer
+        message_router_ = message_router
         message_limit = num_message_limit
 
         # instance client
@@ -63,28 +62,34 @@ class MQTTConsumer:
         self.client.connect(mqtt_broker, keepalive=60, port=mqtt_port)
         self.client.on_message = self._on_message
 
-        # suscribe to channels
-        for t in mqtt_topics:
-            self.client.subscribe(t)
+        # suscribe to all channels
+        self.client.subscribe('/#')
 
     @staticmethod
     def _on_message(client: Any, userdata: str, message: str) -> None:
         """"Consumes messages and dumps it into deepint when real time is set to true.
         """
 
-        global message_queue, message_limit
+        global message_queue, message_limit, message_router_
 
         # extract data from message
         topic = message.topic
         content = json.loads(message.payload.decode("utf-8"))
 
         # add message to queue
-        message_queue.append(content)
+        logger.info('new message')
+        if topic not in message_queue:
+            message_queue[topic] = []
+        message_queue[topic].append(content)
 
         # dump into deepint if neccesary
-        if len(message_queue) >= message_limit:
-            producer.produce(data=message_queue)
-            message_queue.clear()
+        if len(message_queue[topic]) >= message_limit:
+            producer = message_router_.map(topic)
+            if producer is None:
+                logger.info(f'Dumping messages from topic {topic} due to lack of configuration from server.')
+            else:
+                producer.produce(data=message_queue)
+                message_queue[topic].clear()
 
     def loop(self) -> None:
         """ Starts the MQTT consumer and produces messages to deepint for undefined time.
