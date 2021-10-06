@@ -1,0 +1,23 @@
+name: deploy
+
+on:
+  push:
+    branches: main
+
+jobs:
+  download: 
+    runs-on: [self-hosted, linux, x64]  
+    steps:  
+    - name: download new changes
+      uses: actions/checkout@v2
+  deploy:
+    runs-on: [self-hosted, linux, x64]  
+    needs: download
+    steps:
+    - name: install
+      run: sudo python3 -m pip install . --upgrade
+    - name: restart with pm2
+      run: sudo pm2 restart mqtt-deepint-connector.pm2.json --update-env
+      working-directory: deployment
+    - name: create pm2 service
+      run: sudo pm2 startup
