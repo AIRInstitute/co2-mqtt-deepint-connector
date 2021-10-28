@@ -4,9 +4,13 @@
 # See LICENSE for details.
 
 
+from time import sleep
 from typing import Dict, List, Any
 
-from co2_mqtt_deepint_connector import MessageRouter, MQTTConsumer
+from co2_mqtt_deepint_connector import MessageRouter, MQTTConsumer, serve_application_logger
+
+
+logger = serve_application_logger()
 
 
 def connect(
@@ -47,4 +51,12 @@ def connect(
             , num_message_limit=mqtt_num_message_limit
         )
 
-    consumer.loop()
+    failed = True
+    while failed:
+        try:
+            consumer.loop()
+            failed = False
+        except:
+            logger.warning('MQTT connection failed, trying in 5 seconds again ...')
+            sleep(5)
+            failed = True

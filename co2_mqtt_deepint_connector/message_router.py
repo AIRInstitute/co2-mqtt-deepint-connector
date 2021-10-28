@@ -36,10 +36,12 @@ class MessageRouter:
         """
 
         try:
-            response = request.post(config_url)
-            self.router = response.json()
-        except Exception as se:
-            logger.info(f'Exception on config fetch {e}')
+            response = requests.post(self.config_url)
+            raw_router = response.json()
+            if raw_router is not None:
+                self.router = raw_router
+        except Exception as e:
+            logger.warning(f'Exception on config fetch {e}')
 
     def resolve(self, mqtt_topic:str) -> Optional[DeepintProducer]:
         """Builds a Deep Intelligence Producer for a given MQTT topic.
