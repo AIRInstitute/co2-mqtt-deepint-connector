@@ -55,6 +55,8 @@ class DeepintProducer:
             # create dataframe and send it to deep intelligence
             logger.info(f"publishing message {data}")
             source.instances.update(data=df, replace=False)
+            t.resolve()
+
         except Exception as e:
             logger.info(e)
 
