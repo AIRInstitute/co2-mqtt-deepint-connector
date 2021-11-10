@@ -31,15 +31,24 @@ class MessageRouter:
         self.config_url = config_url
         self.deepint_auth_token = deepint_auth_token
 
-    def update(self) -> None:
+    def update(self, mqtt_topic: str) -> None:
         """ Updates the configuration checking the API.
         """
 
         try:
-            response = requests.post(self.config_url)
-            raw_router = response.json()
-            if raw_router is not None:
-                self.router = raw_router
+            response = requests.get(url=self.config_url, params={'topic': mqtt_topic})
+            response_info = response.json()
+
+            if response_info is not None:
+                topic_info = {
+                    'token': response_info['token'],
+                    'source_id': response_info['srcId'],
+                    'workspace_id': response_info['wsId'],
+                    'organization_id': response_info['orgId']
+                }
+
+                self.router[mqtt_topic] = topic_info
+
         except Exception as e:
             logger.warning(f'Exception on config fetch {e}')
 
@@ -57,13 +66,14 @@ class MessageRouter:
 
         # if the topic is not in the router update the configuration
         if mqtt_topic not in self.router:
-            self.update()
+            self.update(mqtt_topic)
 
         # if the topic is not in router after updating the config finish
         if mqtt_topic not in self.router:
             return None
 
         # retrieve the configuration from router
+        token = self.router[mqtt_topic]['token']
         source_id = self.router[mqtt_topic]['source_id']
         workspace_id = self.router[mqtt_topic]['workspace_id']
         organization_id = self.router[mqtt_topic]['organization_id']
@@ -73,6 +83,7 @@ class MessageRouter:
                 , organization_id=organization_id
                 , workspace_id=workspace_id
                 , source_id=source_id
+                , cipher_key=token
             )
 
         return producer

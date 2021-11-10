@@ -6,6 +6,8 @@
 
 import deepint
 import pandas as pd
+import Crypto.Cipher.AES
+from Crypto.Cipher import AES
 from typing import Dict, List, Any
 
 from co2_mqtt_deepint_connector import serve_application_logger
@@ -27,19 +29,27 @@ class DeepintProducer:
         source_id: Deep intelligence source's id, where data will be dumped.
     """
 
-    def __init__(self, auth_token: str, organization_id: str, workspace_id: str, source_id: str) -> None:
+    def __init__(self, auth_token: str, organization_id: str, workspace_id: str, source_id: str, cipher_key: str = None) -> None:
         self.source_id = source_id
         self.workspace_id = workspace_id
         self.organization_id = organization_id
         self.credentials = deepint.Credentials.build(token=auth_token)
 
-    def produce(self, data: List[Dict[str, Any]]) -> None:
+        self.cipher_key = cipher_key
+
+    def produce(self, data: List[str]) -> None:
         """Produces the given data to AIR Institute
         
         Args:
             data: JSON formatted data to dump into AIR Institute.
         """
         try:
+
+            if cipher_key is not None:
+                decipher = AES.new(self.cipher_key,AES.MODE_CBC,IV)
+                data = [decipher.decrypt(d) for d in data]
+
+            data = [json.loads(d) for d in data]
 
             # build dataframe with data
             df = pd.DataFrame(data=data)
