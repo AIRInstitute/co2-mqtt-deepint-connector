@@ -74,7 +74,7 @@ class MQTTConsumer:
 
         # extract data from message
         topic = message.topic
-        content = json.loads(message.payload.decode("utf-8"))
+        content = message.payload.decode("utf-8")
 
         # add message to queue
         if topic not in message_queue:
