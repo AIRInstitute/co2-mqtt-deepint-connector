@@ -18,6 +18,5 @@ jobs:
       run: sudo python3 -m pip install . --upgrade
     - name: restart with pm2
       run: sudo pm2 restart mqtt-deepint-connector.pm2.json --update-env
-      working-directory: deployment
     - name: create pm2 service
       run: sudo pm2 startup
