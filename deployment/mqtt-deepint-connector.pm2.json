@@ -3,8 +3,7 @@
     {
       "name": "co2-mqtt-deepint-connector",
       "interpreter": "/bin/bash",
-      "script": "co2-mqtt-deepint-connector",
-      "args": "212.128.140.31 2780 bisite bisite00 http://212.128.140.31:8080/api/v1/co2/devices/info JKM1wuXItbZ0JRF8ZdaNE6PW9iGmND2_Kyq2KVnG1MIPch_czSLXC1N24GLWjAZszI4eQrQuxRvdUxsNtF0KLw client 10 False",
+      "script": "../launch.sh",
       "out_file": "/var/log/co2-mqtt-deepint-connector.log",
       "error_file": "/var/log/co2-mqtt-deepint-connector.log"
     }
