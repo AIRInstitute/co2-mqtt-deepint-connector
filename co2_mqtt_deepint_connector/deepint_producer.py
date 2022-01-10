@@ -34,7 +34,6 @@ class DeepintProducer:
         self.workspace_id = workspace_id
         self.organization_id = organization_id
         self.credentials = deepint.Credentials.build(token=auth_token)
-
         self.cipher_key = cipher_key
 
     def produce(self, data: List[str]) -> None:
@@ -45,7 +44,7 @@ class DeepintProducer:
         """
         try:
 
-            if cipher_key is not None:
+            if self.cipher_key is not None:
                 decipher = AES.new(self.cipher_key,AES.MODE_CBC,IV)
                 data = [decipher.decrypt(d) for d in data]
 
