@@ -3,6 +3,7 @@
 # Copyright 2021 AIR Institute
 # See LICENSE for details.
 
+import uuid
 import typer
 from typing import Dict, List, Any
 
@@ -50,7 +51,7 @@ def run(
         , mqtt_password=mqtt_password
         , deepint_auth_token=deepint_auth_token
         , config_url=config_url
-        , mqtt_client_id=mqtt_client_id
+        , mqtt_client_id=str(uuid.uuid4())
         , mqtt_num_message_limit=mqtt_num_message_limit
     )
 
