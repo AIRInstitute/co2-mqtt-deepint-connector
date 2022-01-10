@@ -14,8 +14,6 @@ jobs:
     runs-on: [self-hosted, linux, x64]  
     needs: download
     steps:
-    - name: install
-      run: sudo python3 -m pip install . --upgrade
     - name: restart with pm2
       run: sudo pm2 restart mqtt-deepint-connector.pm2.json --update-env
     - name: create pm2 service

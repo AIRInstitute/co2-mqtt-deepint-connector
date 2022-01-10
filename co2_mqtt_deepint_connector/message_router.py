@@ -37,6 +37,11 @@ class MessageRouter:
 
         try:
             response = requests.get(url=self.config_url, params={'topic': mqtt_topic})
+
+            if response.status_code != 200:
+                logger.warning(f'API response returned code {response.status_code} with message: {response.json()}')
+                return
+
             response_info = response.json()
 
             if response_info is not None:
