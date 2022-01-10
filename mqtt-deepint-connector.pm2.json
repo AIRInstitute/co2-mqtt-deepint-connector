@@ -3,7 +3,7 @@
     {
       "name": "co2-mqtt-deepint-connector",
       "interpreter": "/bin/bash",
-      "script": "../launch.sh",
+      "script": "launch.sh",
       "out_file": "/var/log/co2-mqtt-deepint-connector.log",
       "error_file": "/var/log/co2-mqtt-deepint-connector.log"
     }
