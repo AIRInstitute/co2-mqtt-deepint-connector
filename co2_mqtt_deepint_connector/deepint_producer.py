@@ -44,12 +44,15 @@ class DeepintProducer:
         """
         try:
 
+
             if self.cipher_key is not None:
                 decipher = AES.new(self.cipher_key,AES.MODE_CBC,IV)
                 data = [decipher.decrypt(d) for d in data]
 
             data = [json.loads(d) for d in data]
 
+            logger.info(f"producing data {data}")
+            
             # build dataframe with data
             df = pd.DataFrame(data=data)
 
