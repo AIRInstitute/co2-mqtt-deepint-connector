@@ -52,7 +52,7 @@ class DeepintProducer:
             data = [json.loads(d) for d in data]
 
             logger.info(f"producing data {data}")
-            
+
             # build dataframe with data
             df = pd.DataFrame(data=data)
 
@@ -71,4 +71,5 @@ class DeepintProducer:
 
         except Exception as e:
             logger.warning(f'Exception during Deep Intelligence source update {e}')
+            raise e
 
