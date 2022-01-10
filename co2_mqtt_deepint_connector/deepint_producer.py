@@ -46,7 +46,7 @@ class DeepintProducer:
 
 
             if self.cipher_key is not None:
-                decipher = AES.new(self.cipher_key,AES.MODE_CBC,IV)
+                decipher = AES.new(self.cipher_key,AES.MODE_CBC)
                 data = [decipher.decrypt(d) for d in data]
 
             data = [json.loads(d) for d in data]
