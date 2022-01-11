@@ -85,6 +85,10 @@ class MQTTConsumer:
         topic = message.topic
         content = message.payload.decode("utf-8")
 
+        # discard test device
+        if topic == '/CO2_project/123456/mvw2f59w':
+            return
+
         # add message to queue
         if topic not in message_queue:
             message_queue[topic] = []
