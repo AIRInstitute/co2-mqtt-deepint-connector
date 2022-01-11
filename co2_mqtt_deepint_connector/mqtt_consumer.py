@@ -57,13 +57,22 @@ class MQTTConsumer:
         # instance client
         logger.info('Connecting to MQTT')
         mqtt_client_id = f'deepint-connector-{str(uuid.uuid4())}' if mqtt_client_id is None else mqtt_client_id
+        
         self.client = mqtt.Client(mqtt_client_id, protocol=mqtt.MQTTv31)
         self.client.username_pw_set(mqtt_user, password=mqtt_password)
-        self.client.connect(mqtt_broker, keepalive=60, port=mqtt_port)
+
+        self.client.on_connect = self._on_connect
         self.client.on_message = self._on_message
 
+        self.client.connect(mqtt_broker, keepalive=60, port=mqtt_port)
+
+    @staticmethod
+    def _on_connect(client, userdata, flags, rc):
+        
+        logger.info(f"connected with status code {rc}")
+        
         # suscribe to all channels
-        self.client.subscribe('/#')
+        client.subscribe('/#')
 
     @staticmethod
     def _on_message(client: Any, userdata: str, message: str) -> None:
@@ -90,16 +99,17 @@ class MQTTConsumer:
                 logger.warning(f'deleting messages from topic {topic} due to lack of configuration from server')
             else:
                 logger.info(f'sending messages from topic {topic} to deepint.net')
-                producer.produce(data=message_queue)
+                producer.produce(data=message_queue[topic])
             message_queue[topic].clear()
 
     def loop(self) -> None:
         """ Starts the MQTT consumer and produces messages to deepint for undefined time.
         """
 
-        self.client.loop_start()
-        self.client.loop()
-        
+        #self.client.loop_start()
+        #self.client.loop()
+        self.client.loop_forever()
+
         logger.info('Started consumer')
 
         # wait into the loop

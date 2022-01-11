@@ -41,22 +41,20 @@ def connect(
             , config_url=config_url
         )
 
-    consumer = MQTTConsumer(
-            message_router=router
-            , mqtt_broker=mqtt_broker
-            , mqtt_port=mqtt_port
-            , mqtt_user=mqtt_user
-            , mqtt_password=mqtt_password
-            , mqtt_client_id=mqtt_client_id
-            , num_message_limit=mqtt_num_message_limit
-        )
-
-    failed = True
-    while failed:
+    while True:
         try:
+
+            consumer = MQTTConsumer(
+                message_router=router
+                , mqtt_broker=mqtt_broker
+                , mqtt_port=mqtt_port
+                , mqtt_user=mqtt_user
+                , mqtt_password=mqtt_password
+                , mqtt_client_id=mqtt_client_id
+                , num_message_limit=mqtt_num_message_limit
+            )
             consumer.loop()
-            failed = False
-        except:
+        except Exception as e:
+            raise e
             logger.warning('MQTT connection failed, trying in 5 seconds again ...')
             sleep(5)
-            failed = True

@@ -51,7 +51,7 @@ def run(
         , mqtt_password=mqtt_password
         , deepint_auth_token=deepint_auth_token
         , config_url=config_url
-        , mqtt_client_id=str(uuid.uuid4())
+        , mqtt_client_id=None
         , mqtt_num_message_limit=mqtt_num_message_limit
     )
 
