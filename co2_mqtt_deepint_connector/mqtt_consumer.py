@@ -58,7 +58,7 @@ class MQTTConsumer:
         logger.info('Connecting to MQTT')
         mqtt_client_id = f'deepint-connector-{str(uuid.uuid4())}' if mqtt_client_id is None else mqtt_client_id
         
-        self.client = mqtt.Client(mqtt_client_id, protocol=mqtt.MQTTv31)
+        self.client = mqtt.Client(mqtt_client_id, clean_session =True, protocol=mqtt.MQTTv31)
         self.client.username_pw_set(mqtt_user, password=mqtt_password)
 
         self.client.on_connect = self._on_connect
