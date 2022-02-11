@@ -86,6 +86,8 @@ class DeepintProducer:
             # create dataframe and send it to deep intelligence
             logger.info(f"publishing {len(df)} messages to source {self.source_id}")
             t = source.instances.update(data=df, replace=False)
-            t.resolve()
+            #t.resolve()
+    
+            logger.info('finished message producing succesfully')
         except Exception as e:
             logger.warning(f'Exception during Deep Intelligence source update {e}')
