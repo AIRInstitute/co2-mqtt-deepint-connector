@@ -55,6 +55,5 @@ def connect(
             )
             consumer.loop()
         except Exception as e:
-            raise e
             logger.warning('MQTT connection failed, trying in 5 seconds again ...')
             sleep(5)

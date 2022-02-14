@@ -20,6 +20,25 @@ message_router_ = None
 logger = serve_application_logger()
 
 
+def debug_messages(message, topic):
+    import datetime
+    import pandas as pd
+
+    try:
+        df = pd.read_csv('messages.csv')
+    except:
+        df = pd.DataFrame(data={'date': [] , 'topic': []})
+
+    new_df = pd.DataFrame(data=[{
+        'date': datetime.datetime.now(),
+        'topic': topic
+    }])
+
+    df = pd.concat([df, new_df], ignore_index=True)
+
+    df.to_csv('messages.csv', index=False)
+
+
 class MQTTConsumer:
     """Consumes from a MQTT list of topics.
 
@@ -75,36 +94,46 @@ class MQTTConsumer:
         client.subscribe('/#')
 
     @staticmethod
-    def _on_message(client: Any, userdata: str, message: str) -> None:
+    def _on_message(client: Any, userdata: str, message: Any) -> None:
         """"Consumes messages and dumps it into deepint when real time is set to true.
         """
 
-        global message_queue, message_limit, message_router_
+        try:
 
-        # extract data from message
-        topic = message.topic
-        content = message.payload.decode("utf-8")
+            global message_queue, message_limit, message_router_
 
-        # discard test device
-        if topic == '/CO2_project/123456/mvw2f59w':
-            return
+            # extract data from message
+            topic = message.topic
+            content = message.payload.decode("utf-8")
 
-        # add message to queue
-        if topic not in message_queue:
-            message_queue[topic] = []
-            logger.info(f'added new topic {topic}')
+            # discard configuration messages
+            if 'configuration' in topic or 'update' in topic:
+                return
 
-        message_queue[topic].append(content)
+            debug_messages(message=content, topic=topic)
 
-        # dump into deepint if neccesary
-        if len(message_queue[topic]) >= message_limit:
-            producer = message_router_.resolve(topic)
-            if producer is None:
-                logger.warning(f'deleting messages from topic {topic} due to lack of configuration from server')
-            else:
-                logger.info(f'sending messages from topic {topic} to deepint.net')
-                producer.produce(data=message_queue[topic])
-            message_queue[topic].clear()
+            # discard test device
+            if topic == '/CO2_project/123456/mvw2f59w':
+                return
+
+            # add message to queue
+            if topic not in message_queue:
+                message_queue[topic] = []
+                logger.info(f'added new topic {topic}')
+
+            message_queue[topic].append(content)
+
+            # dump into deepint if neccesary
+            if len(message_queue[topic]) >= message_limit:
+                producer = message_router_.resolve(topic)
+                if producer is None:
+                    logger.warning(f'deleting messages from topic {topic} due to lack of configuration from server')
+                else:
+                    logger.info(f'sending messages from topic {topic} to deepint.net')
+                    producer.produce(data=message_queue[topic])
+                message_queue[topic].clear()
+        except Excepion as e:
+            logger.warning(f'error on message receiving {e}')
 
     def loop(self) -> None:
         """ Starts the MQTT consumer and produces messages to deepint for undefined time.

@@ -84,11 +84,15 @@ class MessageRouter:
         organization_id = self.router[mqtt_topic]['organization_id']
 
         # build producer
-        producer = DeepintProducer(auth_token=self.deepint_auth_token
-                , organization_id=organization_id
-                , workspace_id=workspace_id
-                , source_id=source_id
-                , cipher_key=token
-            )
+        try:
+            producer = DeepintProducer(auth_token=self.deepint_auth_token
+                    , organization_id=organization_id
+                    , workspace_id=workspace_id
+                    , source_id=source_id
+                    , cipher_key=token
+                )
+        except Exception as e:
+            logger.warning(f'Error on instancing deepint producer {e}')
+            return None
 
         return producer

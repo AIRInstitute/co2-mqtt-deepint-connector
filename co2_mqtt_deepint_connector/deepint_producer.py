@@ -17,6 +17,36 @@ from co2_mqtt_deepint_connector import serve_application_logger
 logger = serve_application_logger()
 
 
+def debug_errored_messages(cause, message, organization, workspace, source):
+    import datetime
+    import pandas as pd
+
+    try:
+        df = pd.read_csv('errored_messages.csv')
+    except:
+        df = pd.DataFrame(data={
+            'date': []
+            , 'cause': []
+            , 'organization': []
+            , 'workspace': []
+            , 'source': []
+            , 'message': []
+        })
+
+    new_df = pd.DataFrame(data=[{
+        'date': datetime.datetime.now(),
+        'cause': cause,
+        'organization': organization,
+        'workspace': workspace,
+        'source': source,
+        'message': message
+    }])
+
+    df = pd.concat([df, new_df], ignore_index=True)
+
+    df.to_csv('errored_messages.csv', index=False)
+
+
 class DeepintProducer:
     """Produces to AIR Institute the given data, updating a source.
 
@@ -67,11 +97,10 @@ class DeepintProducer:
         try:
             data = [self.decript_string(d) for d in data]
         except Exception as e:
+            debug_errored_messages('CIPHER', data, self.organization_id, self.workspace_id, self.source_id)
             logger.warning(f'Exception during message decrypt process: {e}')
 
         try:
-            logger.info(f"producing data {data}")
-
             # build dataframe with data
             df = pd.DataFrame(data=data)
 
@@ -90,4 +119,5 @@ class DeepintProducer:
     
             logger.info('finished message producing succesfully')
         except Exception as e:
+            debug_errored_messages('PRODUCE', data, self.organization_id, self.workspace_id, self.source_id)
             logger.warning(f'Exception during Deep Intelligence source update {e}')
