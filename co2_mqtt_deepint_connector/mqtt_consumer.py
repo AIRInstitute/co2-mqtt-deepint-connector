@@ -20,25 +20,6 @@ message_router_ = None
 logger = serve_application_logger()
 
 
-def debug_messages(message, topic):
-    import datetime
-    import pandas as pd
-
-    try:
-        df = pd.read_csv('messages.csv')
-    except:
-        df = pd.DataFrame(data={'date': [] , 'topic': []})
-
-    new_df = pd.DataFrame(data=[{
-        'date': datetime.datetime.now(),
-        'topic': topic
-    }])
-
-    df = pd.concat([df, new_df], ignore_index=True)
-
-    df.to_csv('messages.csv', index=False)
-
-
 class MQTTConsumer:
     """Consumes from a MQTT list of topics.
 
@@ -107,13 +88,7 @@ class MQTTConsumer:
             content = message.payload.decode("utf-8")
 
             # discard configuration messages
-            if 'configuration' in topic or 'update' in topic:
-                return
-
-            debug_messages(message=content, topic=topic)
-
-            # discard test device
-            if topic == '/CO2_project/123456/mvw2f59w':
+            if 'configuration' in topic or 'update' in topic or topic == '/CO2_project/123456/mvw2f59w':
                 return
 
             # add message to queue
