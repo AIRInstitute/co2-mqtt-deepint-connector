@@ -21,7 +21,7 @@ def connect(
         , config_url: str
         , deepint_auth_token: str
         , mqtt_client_id: str = None
-        , mqtt_num_message_limit: int = 10
+        , flush_interval_seconds: int = 10 * 60
     ):
     """Util function to wrap the usage fo message broker, producer and consumer
 
@@ -33,7 +33,7 @@ def connect(
         mqtt_user: MQTT's broker user.
         mqtt_password: MQTT's broker password.
         mqtt_client_id: MQTT's client id. If not provided, an UUIDv4 will be generated.
-        mqtt_num_message_limit: number of messages to store before dumpt to AIR Institute. If set to 0 each message is send.
+        flush_interval_seconds: number of seconds to wait between message queue flushes.
     """
 
     router = MessageRouter(
@@ -51,9 +51,9 @@ def connect(
                 , mqtt_user=mqtt_user
                 , mqtt_password=mqtt_password
                 , mqtt_client_id=mqtt_client_id
-                , num_message_limit=mqtt_num_message_limit
+                , flush_interval_seconds=flush_interval_seconds
             )
             consumer.loop()
         except Exception as e:
-            logger.warning('MQTT connection failed, trying in 5 seconds again ...')
+            logger.warning(f'MQTT connection failed ({e}), trying in 5 seconds again ...')
             sleep(5)

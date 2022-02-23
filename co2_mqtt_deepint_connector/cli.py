@@ -23,7 +23,7 @@ def run(
     , config_url: str = typer.Argument(default=None, help="URL of the mapping (between MQTT and Deep Intelligence) configuration server's endpoint.")
     , deepint_auth_token: str = typer.Argument(default=None, help="Authentication token for AIR Institute")
     , mqtt_client_id: str = typer.Argument(default=None, help="MQTT's client id. If not provided, an UUIDv4 will be generated")
-    , mqtt_num_message_limit: int = typer.Argument(default=10, help="number of messages to store before dumpt to AIR Institute. If set to 0 each message is send")
+    , flush_interval_seconds: int = typer.Argument(default=60*10, help="number of seconds to wait between message queue flushes")
     , quiet_mode_set: bool = typer.Argument(default=False, help=" if set to true no logging information is provided.")) -> None:
     """While running dumps messages received from MQTT into deepint.
     """
@@ -52,7 +52,7 @@ def run(
         , deepint_auth_token=deepint_auth_token
         , config_url=config_url
         , mqtt_client_id=None
-        , mqtt_num_message_limit=mqtt_num_message_limit
+        , flush_interval_seconds=flush_interval_seconds
     )
 
 

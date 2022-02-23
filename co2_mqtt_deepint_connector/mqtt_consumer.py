@@ -7,15 +7,18 @@
 import json
 import time
 import uuid
+import datetime
 import paho.mqtt.client as mqtt
 from typing import Dict, List, Any
 
 from co2_mqtt_deepint_connector import DeepintProducer, MessageRouter, serve_application_logger
 
 
-message_limit = 10
+
 message_queue = {}
 message_router_ = None
+flush_interval = None
+last_queue_flush = datetime.datetime.now()
 
 logger = serve_application_logger()
 
@@ -35,7 +38,7 @@ class MQTTConsumer:
         mqtt_user: MQTT's broker user.
         mqtt_password: MQTT's broker password.
         mqtt_client_id: MQTT's client id. If not provided, an UUIDv4 will be generated.
-        num_message_limit: number of messages to store before dumpt to AIR Institute. If set to 0 each message is send.
+        flush_interval_seconds: number of seconds to wait between message queue flushes.
     """
 
     def __init__(self
@@ -45,14 +48,14 @@ class MQTTConsumer:
             , mqtt_user: str
             , mqtt_password: str
             , mqtt_client_id: str = None
-            , num_message_limit: int = 10
+            , flush_interval_seconds: int = 10 * 60
         ):
 
-        global message_router_, message_limit
+        global message_router_, flush_interval
 
         # save producer
         message_router_ = message_router
-        message_limit = num_message_limit
+        flush_interval = datetime.timedelta(seconds=flush_interval_seconds)
 
         # instance client
         logger.info('Connecting to MQTT')
@@ -81,7 +84,7 @@ class MQTTConsumer:
 
         try:
 
-            global message_queue, message_limit, message_router_
+            global message_queue, last_queue_flush, flush_interval, message_router_
 
             # extract data from message
             topic = message.topic
@@ -92,21 +95,26 @@ class MQTTConsumer:
                 return
 
             # add message to queue
-            if topic not in message_queue:
-                message_queue[topic] = []
-                logger.info(f'added new topic {topic}')
+            org = topic.split('/')[1]
+            if org not in message_queue:
+                message_queue[org]= []
+                
+            message_queue[org].append({
+                'topic': topic,
+                'content': content
+            })
 
-            message_queue[topic].append(content)
+            # flush if neccesary
+            now = datetime.datetime.now()
+            if (now - last_queue_flush) >= flush_interval:
 
-            # dump into deepint if neccesary
-            if len(message_queue[topic]) >= message_limit:
-                producer = message_router_.resolve(topic)
-                if producer is None:
-                    logger.warning(f'deleting messages from topic {topic} due to lack of configuration from server')
-                else:
-                    logger.info(f'sending messages from topic {topic} to deepint.net')
-                    producer.produce(data=message_queue[topic])
-                message_queue[topic].clear()
+                last_queue_flush = now
+                messages, message_queue = message_queue, {}
+
+                for topic in messages:
+                    producer = message_router_.resolve(topic)
+                    producer.produce(data=[m['content'] for m in messages[topic]])
+
         except Excepion as e:
             logger.warning(f'error on message receiving {e}')
 

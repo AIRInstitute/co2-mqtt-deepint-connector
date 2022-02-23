@@ -5,7 +5,7 @@ StartLimitIntervalSec=0
  
 [Service] 
 Type=simple
-ExecStart=co2-mqtt-deepint-connector <MQTT_BROKER> <MQTT_PORT> <MQTT_USER> <MQTT_PASSWORD> <CONFIG_URL> <DEEPINT_AUTH_TOKEN> <MQTT_CLIENT_ID> <MQTT_NUM_MESSAGE_LIMIT> <QUIET_MODE_SET> 
+ExecStart=co2-mqtt-deepint-connector <MQTT_BROKER> <MQTT_PORT> <MQTT_USER> <MQTT_PASSWORD> <CONFIG_URL> <DEEPINT_AUTH_TOKEN> <MQTT_CLIENT_ID> <MQTT_NUM_MESAGE_QUEUE_FLUSH> <QUIET_MODE_SET> 
  
 [Install] 
 WantedBy=multi-user.target
