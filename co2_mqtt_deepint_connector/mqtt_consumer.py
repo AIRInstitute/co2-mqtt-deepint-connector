@@ -58,8 +58,8 @@ class MQTTConsumer:
         flush_interval = datetime.timedelta(seconds=flush_interval_seconds)
 
         # instance client
-        logger.info('Connecting to MQTT')
         mqtt_client_id = f'deepint-connector-{str(uuid.uuid4())}' if mqtt_client_id is None else mqtt_client_id
+        logger.info(f'connecting to MQTT (client id: {mqtt_client_id})')
         
         self.client = mqtt.Client(mqtt_client_id, clean_session =True, protocol=mqtt.MQTTv31)
         self.client.username_pw_set(mqtt_user, password=mqtt_password)
@@ -89,6 +89,8 @@ class MQTTConsumer:
             # extract data from message
             topic = message.topic
             content = message.payload.decode("utf-8")
+
+            logging.info(f'message from {topic} (currently {1+sum(len(v) for v in message_queue.values())} messages queued)')
 
             # discard configuration messages
             if 'configuration' in topic or 'update' in topic or topic == '/CO2_project/123456/mvw2f59w':
@@ -122,12 +124,4 @@ class MQTTConsumer:
         """ Starts the MQTT consumer and produces messages to deepint for undefined time.
         """
 
-        #self.client.loop_start()
-        #self.client.loop()
         self.client.loop_forever()
-
-        logger.info('Started consumer')
-
-        # wait into the loop
-        while True:
-            time.sleep(4)
