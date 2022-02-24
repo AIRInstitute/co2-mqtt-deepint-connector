@@ -90,7 +90,7 @@ class MQTTConsumer:
             topic = message.topic
             content = message.payload.decode("utf-8")
 
-            logging.info(f'message from {topic} (currently {1+sum(len(v) for v in message_queue.values())} messages queued)')
+            logger.info(f'message from {topic} (currently {1+sum(len(v) for v in message_queue.values())} messages queued)')
 
             # discard configuration messages
             if 'configuration' in topic or 'update' in topic or topic == '/CO2_project/123456/mvw2f59w':
@@ -117,8 +117,8 @@ class MQTTConsumer:
                     producer = message_router_.resolve(topic)
                     producer.produce(data=[m['content'] for m in messages[topic]])
 
-        except Excepion as e:
-            logger.warning(f'error on message receiving {e}')
+        except Exception as e:
+            logger.warning(f'error on message receiving: {e}')
 
     def loop(self) -> None:
         """ Starts the MQTT consumer and produces messages to deepint for undefined time.
