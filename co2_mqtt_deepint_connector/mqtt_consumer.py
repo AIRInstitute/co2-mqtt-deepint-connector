@@ -109,12 +109,16 @@ class MQTTConsumer:
                 messages, message_queue = message_queue, {}
 
                 for topic in messages:
+                    
                     producer = message_router_.resolve(topic)
                     if producer is None:
-                        logger.warning(f'organization not found in API (topic {topic})')
+                        logger.warning(f'unable to resolve (topic {topic})')
                         continue
-                    else:
+
+                    try:
                         producer.produce(data=messages[topic])
+                    except:
+                        message_router_.remove(topic)
 
         except Exception as e:
             logger.warning(f'error on message receiving: {e}')
