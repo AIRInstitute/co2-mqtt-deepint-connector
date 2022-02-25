@@ -90,21 +90,16 @@ class MQTTConsumer:
             topic = message.topic
             content = message.payload.decode("utf-8")
 
-            logger.info(f'message from {topic} (currently {1+sum(len(v) for v in message_queue.values())} messages queued)')
-
             # discard configuration messages
             if 'configuration' in topic or 'update' in topic or topic == '/CO2_project/123456/mvw2f59w':
                 return
 
+            logger.info(f'message from {topic} (currently {1+sum(len(v) for v in message_queue.values())} messages queued)')
+
             # add message to queue
-            org = topic.split('/')[1]
-            if org not in message_queue:
-                message_queue[org]= []
-                
-            message_queue[org].append({
-                'topic': topic,
-                'content': content
-            })
+            if topic not in message_queue:
+                message_queue[topic] = []
+            message_queue[topic].append(content)
 
             # flush if neccesary
             now = datetime.datetime.now()
@@ -115,7 +110,11 @@ class MQTTConsumer:
 
                 for topic in messages:
                     producer = message_router_.resolve(topic)
-                    producer.produce(data=[m['content'] for m in messages[topic]])
+                    if producer is None:
+                        logger.warning(f'organization not found in API (topic {topic})')
+                        continue
+                    else:
+                        producer.produce(data=messages[topic])
 
         except Exception as e:
             logger.warning(f'error on message receiving: {e}')
