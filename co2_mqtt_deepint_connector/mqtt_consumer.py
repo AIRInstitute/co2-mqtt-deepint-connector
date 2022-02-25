@@ -109,12 +109,14 @@ class MQTTConsumer:
                 messages, message_queue = message_queue, {}
 
                 for topic in messages:
-                    
+
+                    # resolve producer                    
                     producer = message_router_.resolve(topic)
                     if producer is None:
                         logger.warning(f'unable to resolve (topic {topic})')
                         continue
 
+                    # produce, and if there is an erorr remove data cache for topic        
                     try:
                         producer.produce(data=messages[topic])
                     except:

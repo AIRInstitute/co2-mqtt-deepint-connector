@@ -98,7 +98,7 @@ class MessageRouter:
         return producer
 
 
-    def resolve(self, mqtt_topic:str) -> None:
+    def remove(self, mqtt_topic:str) -> None:
         """Removes the cached information of a MQTT topic in the internal router.
 
         Args:
