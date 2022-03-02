@@ -7,11 +7,11 @@
 sudo python3 -m pip install . --upgrade
 
 # define parameters
-MQTT_BROKER="212.128.140.74"
+MQTT_BROKER="localhost"
 MQTT_PORT="2780"
 MQTT_USER="bisite"
 MQTT_PASSWORD="bisite00"
-CONFIG_URL="http://212.128.140.74:8080/api/v1/co2/devices/info"
+CONFIG_URL="http://localhost:8080/api/v1/co2/devices/info"
 DEEPINT_AUTH_TOKEN="bpZgeQ7qqmwbr04ux4-oCfv5fk1o4ApVRT8o3Wi4CiowfuQDvpC2X2Uqohnc3htHcUwca0g_ldpGIK4MeQFZEw"
 MQTT_CLIENT_ID=""
 NUM_SECONDS_QUEUE_FLUSH="600"
